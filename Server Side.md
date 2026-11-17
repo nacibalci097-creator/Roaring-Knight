@@ -1,7 +1,6 @@
 Main server
 ```luau
 local abilityinfo_module = require(game.ReplicatedStorage.Modules.AbilityInfo)
-local iscolliding_module = require(game.ReplicatedStorage.Modules.IsColliding)
 
 local events = game.ReplicatedStorage.Events
 
@@ -57,12 +56,22 @@ return function(model : Model, ability : string)
 end
 ```
 
+IsColliding
+```luau
+return function(position : Vector3, Hitbox : Part)
+	local v3 = Hitbox.CFrame:PointToObjectSpace(position)
+	return (math.abs(v3.X) <= Hitbox.Size.X / 2)
+		and (math.abs(v3.Y) <= Hitbox.Size.Y / 2)
+		and (math.abs(v3.Z) <= Hitbox.Size.Z / 2)
+end
+```
+
 # Tool Modules
 
 Slash
 ```luau
 local abilityinfo_module = require(game.ReplicatedStorage.Modules.AbilityInfo)
-local iscolliding_module = require(game.ReplicatedStorage.Modules.IsColliding)
+local iscolliding_module = require(game.ServerScriptService.Modules.IsColliding)
 local damage_module = require(game.ServerScriptService.Modules.Damage)
 local events = game.ReplicatedStorage.Events
 
@@ -120,7 +129,7 @@ end
 Swoon
 ```luau
 local abilityinfo_module = require(game.ReplicatedStorage.Modules.AbilityInfo)
-local iscolliding_module = require(game.ReplicatedStorage.Modules.IsColliding)
+local iscolliding_module = require(game.ServerScriptService.Modules.IsColliding)
 local damage_module = require(game.ServerScriptService.Modules.Damage)
 
 return function(player : Player, ability : string, targets : {any})
