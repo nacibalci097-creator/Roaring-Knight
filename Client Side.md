@@ -1,4 +1,6 @@
-# Main
+# Main local scripts
+
+Tools
 ```luau
 local player = game.Players.LocalPlayer
 local tools = player.Backpack:GetChildren()
@@ -8,6 +10,100 @@ for _, tool : Tool in tools do
 	require(abilities[tool.Name])(tool, player)
 end
 ```
+
+Effects
+```luau
+repeat task.wait() until game:IsLoaded()
+
+local tweenservice = game:GetService("TweenService")
+local tinfo = TweenInfo.new(1, Enum.EasingStyle.Linear)
+
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+
+local parts = {}
+task.wait(0.1)
+for i, v in char:GetDescendants() do
+	if v:IsA("MeshPart") or v:IsA("Part") then
+		table.insert(parts, v)
+	end
+end
+
+player.CharacterAdded:Connect(function(char)
+	parts = {}
+	
+	for i, v in char:GetDescendants() do
+		if v:IsA("MeshPart") or v:IsA("Part") then
+			table.insert(parts, v)
+		end
+	end
+end)
+
+for i, model : Model in workspace.Targets:GetChildren() do
+	local humanoid : Humanoid = model.Humanoid
+	local oldhealth = humanoid.Health
+	humanoid:GetPropertyChangedSignal("Health"):Connect(function()		
+		local clone = game.ReplicatedStorage.Other.Gui:Clone()
+		clone.Gui.TextLabel.Text = "-" .. oldhealth - humanoid.Health
+		clone.Position = model:GetPivot().Position
+		clone.Parent = workspace.Effects
+		
+		game.SoundService.Hit:Play()
+		oldhealth = humanoid.Health
+		
+		local tween = tweenservice:Create(clone, TweenInfo.new(0.5), {Position = clone.Position + Vector3.new(math.random(-3,3), math.random(5,10), math.random(-3,3))})
+		tween:Play()
+		tween.Completed:Wait()
+		
+		tweenservice:Create(clone.Gui.TextLabel.UIStroke, TweenInfo.new(1), {Transparency = 1}):Play()
+		tween = tweenservice:Create(clone.Gui.TextLabel, TweenInfo.new(1), {TextTransparency = 1})
+		
+		tween:Play()
+		tween.Completed:Wait()
+		clone:Destroy()
+	end)
+end
+
+while task.wait(1 / 12) do
+	local model = Instance.new("Model")
+	
+	for i, v : Part in parts do -- directly cloning the model has cframe issues for some reason????
+		local clone = v:Clone()
+		
+		if clone.Name == "HumanoidRootPart" then model.PrimaryPart = clone end
+		
+		for _, vv in clone:GetDescendants() do
+			if vv:IsA("Attachment") or vv:IsA("Motor6D") or vv:IsA("Decal") then
+				vv:Destroy()
+			end
+		end
+		
+		clone.Material = Enum.Material.SmoothPlastic
+		clone.CFrame = v.CFrame
+		clone.CanCollide = false
+		clone.CastShadow = false
+		clone.Anchored = true
+		
+		clone.Parent = model
+	end
+	
+	model.Parent = workspace.Effects
+
+	task.defer(function()
+		for i, v in model:GetChildren() do
+			tweenservice:Create(v, tinfo, {Transparency = 1}):Play()
+		end
+		
+		for i = 1, 200 do
+			model:PivotTo(model:GetPivot() * CFrame.new(0, 0, 0.02))
+			task.wait()
+		end
+		
+		model:Destroy()
+	end)
+end
+```
+
 # Tools
 Slash
 ```luau
