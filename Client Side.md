@@ -22,22 +22,20 @@ local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 
 local parts = {}
-task.wait(0.1)
-for i, v in char:GetDescendants() do
-	if v:IsA("MeshPart") or v:IsA("Part") then
-		table.insert(parts, v)
-	end
-end
 
-player.CharacterAdded:Connect(function(char)
+local function renew(char : Model)
 	parts = {}
-	
+
 	for i, v in char:GetDescendants() do
 		if v:IsA("MeshPart") or v:IsA("Part") then
 			table.insert(parts, v)
 		end
 	end
-end)
+end
+
+renew(char)
+
+player.CharacterAdded:Connect(renew)
 
 for i, model : Model in workspace.Targets:GetChildren() do
 	local humanoid : Humanoid = model.Humanoid
