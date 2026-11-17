@@ -41,7 +41,23 @@ events.AbilityFunction.OnServerInvoke = function(player : Player, ability : stri
 end
 ```
 
-# Tool Modules:
+# Modules
+
+Damage
+```luau
+local abilityinfo_module = require(game.ReplicatedStorage.Modules.AbilityInfo)
+
+return function(model : Model, ability : string)
+	local damage : NumberRange = abilityinfo_module[ability].Damage
+	local newdamage = 0
+	
+	newdamage = typeof(damage) == "NumberRange" and math.random(damage.Min, damage.Max) or damage
+	
+	model.Humanoid.Health -= newdamage
+end
+```
+
+# Tool Modules
 
 Slash
 ```luau
